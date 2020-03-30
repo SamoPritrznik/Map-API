@@ -12,14 +12,14 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
+using GMap.NET.WindowsForms.Markers;
 using GMap.NET;
 
 namespace Map_API
 {
     public partial class Map_form : Form
     {
-        double lon = Convert.ToDouble(0);
-        double lat = Convert.ToDouble(0);
+        
 
         public Map_form()
         {
@@ -39,45 +39,62 @@ namespace Map_API
             }
 
             gMapControl1.MapProvider = GMapProviders.OpenStreetMap;
-            gMapControl1.Position = new PointLatLng(0, 0);
+            gMapControl1.Position = new PointLatLng(46.35, 15.13);
             gMapControl1.MinZoom = 0;
             gMapControl1.MaxZoom = 24;
             gMapControl1.Zoom = 9;
         }
 
-        public void UpdatePos(double lat, double lon)
+        public void CreateMarker(double lat, double lon, string cty, double tmp, double wind)
         {
-            Console.WriteLine(lat + " " + lon);
-            gMapControl1.Position = new PointLatLng(lat, lon);
-            //gMapControl1.Position = new PointLatLng(54.6961334816182, 25.2985095977783);
+            PointLatLng point = new PointLatLng(lat, lon);
+            GMapMarker marker = new GMarkerGoogle(point, GMarkerGoogleType.purple_pushpin);
+            marker.ToolTipText = cty + ": " + "Temp: " + tmp.ToString() + "  Wind: " + wind.ToString();
+
+            GMapOverlay markers = new GMapOverlay("markers");
+            markers.Markers.Add(marker);
+            gMapControl1.Overlays.Add(markers);
         }
+
+        
 
         private void Load_Location_Click(object sender, EventArgs e)
         {
 
 
             HttpClient clic = new HttpClient();
-            clic.BaseAddress = new Uri("http://localhost:64195/");
 
-            clic.BaseAddress = new Uri("https://best-way.herokuapp.com/api/weather/:cityname");
+            clic.BaseAddress = new Uri($"https://best-way.herokuapp.com/api/between/{StartLocation.Text}/{EndLocation.Text}");
 
-            // Add an Accept header for JSON format.
             clic.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
-           
-            HttpResponseMessage response = clic.GetAsync(Location_name.Text).Result; 
+
+            HttpResponseMessage response = clic.GetAsync("").Result;
             if (response.IsSuccessStatusCode)
-            {
-                // Parse the response body.
-                string dataObjects = response.Content.ReadAsStringAsync().Result;  
+            { 
+                string dataObjects = response.Content.ReadAsStringAsync().Result;
+
+                dynamic process = Newtonsoft.Json.JsonConvert.DeserializeObject(dataObjects);
+
+                for(int x = 0; x < 5; x++)
+                {
+                    double lon = process.result[x].location.longitude;
+                    double lat = process.result[x].location.latitude;
+                    string cty = process.result[x].weather.city;
+                    double tmp = process.result[x].weather.temp;
+                    double wind = process.result[x].weather.wind;
+                    CreateMarker(lat, lon, cty, tmp, wind);
+                    Console.WriteLine(lon + " " + lat);
+                }
+
                 
-                string[] words = dataObjects.Split(':', ',', '}');
+
+                /*string[] words = dataObjects.Split(':', ',', '}');
 
                 lon = double.Parse(words[5], System.Globalization.CultureInfo.InvariantCulture); 
 
-                lat = double.Parse(words[7], System.Globalization.CultureInfo.InvariantCulture);
+                lat = double.Parse(words[7], System.Globalization.CultureInfo.InvariantCulture);*/
 
-                Console.WriteLine(lat + " " + lon);
 
                 
             }
@@ -86,7 +103,6 @@ namespace Map_API
                 Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
             }
 
-            UpdatePos(lat, lon);
 
             clic.Dispose();
         }
