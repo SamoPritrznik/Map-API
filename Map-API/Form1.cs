@@ -40,6 +40,7 @@ namespace Map_API
 
             gMapControl1.MapProvider = GMapProviders.OpenStreetMap;
             gMapControl1.Position = new PointLatLng(46.35, 15.13);
+            gMapControl1.ShowCenter = false;
             gMapControl1.MinZoom = 0;
             gMapControl1.MaxZoom = 24;
             gMapControl1.Zoom = 9;
@@ -90,9 +91,6 @@ namespace Map_API
                     CreateMarker(lat, lon, cty, tmp, wind);
                     Console.WriteLine(lon + " " + lat);
                 }
-
-
-                
             }
             else
             {
@@ -101,6 +99,49 @@ namespace Map_API
 
 
             clic.Dispose();
+        }
+
+        private void GMapControl1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                gMapControl1.Overlays.Clear();
+                Display.Items.Clear();
+                var point = gMapControl1.FromLocalToLatLng(e.X, e.Y);
+                double lat = point.Lat;
+                double lon = point.Lng;
+
+                HttpClient clic = new HttpClient();
+
+                clic.BaseAddress = new Uri($"https://best-way.herokuapp.com/api/weather/{lat}/{lon}");
+
+                clic.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+
+                HttpResponseMessage response = clic.GetAsync("").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string dataObjects = response.Content.ReadAsStringAsync().Result;
+
+                    dynamic process = Newtonsoft.Json.JsonConvert.DeserializeObject(dataObjects);
+
+                    string cty = process.result.weather.city;
+                    double tmp = process.result.weather.temp;
+                    double wind = process.result.weather.wind;
+
+                    CreateMarker(lat, lon, cty, tmp, wind);
+                    Display.Items.Add("Mesto: " + cty + ", temp: " + tmp + ", veter: " + wind);
+                }
+                else
+                {
+                    Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
+                }
+
+
+                clic.Dispose();
+
+                
+            }
         }
     }
 }
