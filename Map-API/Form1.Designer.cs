@@ -35,6 +35,8 @@
             this.Load_Location = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.EndLocation = new System.Windows.Forms.TextBox();
+            this.Display = new System.Windows.Forms.ListBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // splitter1
@@ -113,11 +115,30 @@
             this.EndLocation.Size = new System.Drawing.Size(139, 20);
             this.EndLocation.TabIndex = 6;
             // 
+            // Display
+            // 
+            this.Display.FormattingEnabled = true;
+            this.Display.Location = new System.Drawing.Point(480, 280);
+            this.Display.Name = "Display";
+            this.Display.Size = new System.Drawing.Size(305, 199);
+            this.Display.TabIndex = 7;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(480, 249);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(47, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Lokacije";
+            // 
             // Map_form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(699, 501);
+            this.ClientSize = new System.Drawing.Size(813, 501);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.Display);
             this.Controls.Add(this.EndLocation);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Load_Location);
@@ -141,6 +162,8 @@
         private System.Windows.Forms.Button Load_Location;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox EndLocation;
+        private System.Windows.Forms.ListBox Display;
+        private System.Windows.Forms.Label label2;
     }
 }
 

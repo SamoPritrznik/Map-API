@@ -76,24 +76,20 @@ namespace Map_API
 
                 dynamic process = Newtonsoft.Json.JsonConvert.DeserializeObject(dataObjects);
 
-                for(int x = 0; x < 5; x++)
+                gMapControl1.Overlays.Clear();
+                Display.Items.Clear();
+
+                for (int x = 0; x < 5; x++)
                 {
                     double lon = process.result[x].location.longitude;
                     double lat = process.result[x].location.latitude;
                     string cty = process.result[x].weather.city;
                     double tmp = process.result[x].weather.temp;
                     double wind = process.result[x].weather.wind;
+                    Display.Items.Add("Mesto: " + cty + ", temp: " + tmp + ", veter: " + wind);
                     CreateMarker(lat, lon, cty, tmp, wind);
                     Console.WriteLine(lon + " " + lat);
                 }
-
-                
-
-                /*string[] words = dataObjects.Split(':', ',', '}');
-
-                lon = double.Parse(words[5], System.Globalization.CultureInfo.InvariantCulture); 
-
-                lat = double.Parse(words[7], System.Globalization.CultureInfo.InvariantCulture);*/
 
 
                 
